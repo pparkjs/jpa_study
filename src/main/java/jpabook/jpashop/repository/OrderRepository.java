@@ -104,10 +104,22 @@ public class OrderRepository {
     public List<Order> findAllWithItem() {
         return em.createQuery(
                         "select distinct o from Order o" +
-                                " join fetch o.member m" +
-                                " join fetch o.delivery d" +
-                                " join fetch o.orderItems oi" +
+                                " join fetch o.member m" + // toOne
+                                " join fetch o.delivery d" + // toOne
+                                " join fetch o.orderItems oi" + // toMany fetch join 하면 안됨
                                 " join fetch oi.item i", Order.class)
+                .setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 }
